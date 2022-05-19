@@ -14,7 +14,7 @@ type Cache struct {
 }
 
 func NewCache() Cache {
-	return Cache{}
+	return Cache{data: make(map[string]cacheDatum)}
 }
 
 func (cache *Cache) Get(key string) (string, bool) {
