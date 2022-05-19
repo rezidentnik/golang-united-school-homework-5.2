@@ -24,7 +24,7 @@ func (cache *Cache) Get(key string) (string, bool) {
 		return "", false
 	}
 
-	if !cachedValue.expirationTime.After(time.Now()) {
+	if cachedValue.isExpired() {
 		delete(cache.data, key)
 		return "", false
 	}
@@ -41,7 +41,7 @@ func (cache *Cache) Keys() []string {
 	keys := make([]string, cacheSize)
 	i := 0
 	for key, datum := range cache.data {
-		if datum.expirationTime.After(time.Now()) {
+		if !datum.isExpired() {
 			keys[i] = key
 			i++
 		} else {
@@ -57,4 +57,8 @@ func (cache *Cache) PutTill(key, value string, deadline time.Time) {
 	if deadline.After(time.Now()) {
 		cache.data[key] = cacheDatum{value: value, expirationTime: deadline}
 	}
+}
+
+func (datum cacheDatum) isExpired() bool {
+	return !datum.expirationTime.After(time.Now()) && !datum.expirationTime.IsZero()
 }
